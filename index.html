@@ -1,0 +1,203 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Note App</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #000;
+    color: #fff;
+    font-family: "Segoe UI", Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .app {
+    width: 420px;
+    max-width: 100%;
+    background: #111;
+    border-radius: 14px;
+    padding: 20px;
+
+    /* BLUE BORDER + GLOW */
+    border: 2px solid #1e90ff;
+    box-shadow:
+      0 0 12px rgba(30,144,255,0.5),
+      0 0 30px rgba(30,144,255,0.3);
+    transition: 0.3s ease;
+  }
+
+  .app:hover {
+    box-shadow:
+      0 0 18px rgba(30,144,255,0.7),
+      0 0 40px rgba(30,144,255,0.4);
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #1e90ff;
+  }
+
+  input, textarea, button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+  }
+
+  input, textarea {
+    background: #000;
+    color: #fff;
+    border: 1px solid #333;
+  }
+
+  input:focus, textarea:focus {
+    border-color: #1e90ff;
+  }
+
+  button {
+    background: #1e90ff;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background: #63b3ff;
+  }
+
+  .notes {
+    margin-top: 15px;
+  }
+
+  .note {
+    background: #000;
+    border: 1px solid #1e90ff;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .note h3 {
+    margin: 0 0 5px;
+    color: #63b3ff;
+  }
+
+  .note small {
+    color: #aaa;
+  }
+
+  .actions {
+    margin-top: 8px;
+    display: flex;
+    gap: 6px;
+  }
+
+  .actions button {
+    flex: 1;
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <h1>📝 Note App</h1>
+
+  <input type="text" id="title" placeholder="Note title">
+  <textarea id="content" rows="4" placeholder="Write your note..."></textarea>
+  <button onclick="addNote()">Add Note</button>
+
+  <div class="notes" id="notes"></div>
+</div>
+
+<script>
+  let notes = JSON.parse(localStorage.getItem("notes")) || [];
+
+  function saveNotes() {
+    localStorage.setItem("notes", JSON.stringify(notes));
+  }
+
+  function renderNotes() {
+    const notesDiv = document.getElementById("notes");
+    notesDiv.innerHTML = "";
+
+    notes.forEach((note, index) => {
+      notesDiv.innerHTML += `
+        <div class="note">
+          <h3>${note.title}</h3>
+          <p>${note.content}</p>
+          <small>${note.date}</small>
+          <div class="actions">
+            <button onclick="editNote(${index})">Edit</button>
+            <button onclick="deleteNote(${index})">Delete</button>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  function addNote() {
+    const title = document.getElementById("title").value.trim();
+    const content = document.getElementById("content").value.trim();
+
+    if (!title || !content) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    notes.push({
+      title,
+      content,
+      date: new Date().toLocaleString()
+    });
+
+    saveNotes();
+    renderNotes();
+
+    document.getElementById("title").value = "";
+    document.getElementById("content").value = "";
+  }
+
+  function deleteNote(index) {
+    notes.splice(index, 1);
+    saveNotes();
+    renderNotes();
+  }
+
+  function editNote(index) {
+    const note = notes[index];
+    document.getElementById("title").value = note.title;
+    document.getElementById("content").value = note.content;
+    deleteNote(index);
+  }
+
+  renderNotes();
+</script>
+
+</body>
+</html>
+
